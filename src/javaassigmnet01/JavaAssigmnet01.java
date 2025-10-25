@@ -6,6 +6,7 @@ public class JavaAssigmnet01 {
     private static final Scanner scanner = new Scanner(System.in);
     private static final CityManager cityManager = new CityManager();
     private static final DistanceManager distanceManager = new DistanceManager(cityManager);
+    private static final VehicleManager vehicleManager = new VehicleManager();
 
     public static void main(String[] args) {
         int choice;
@@ -13,6 +14,7 @@ public class JavaAssigmnet01 {
             System.out.println("\n=== Logistics Management System ===");
             System.out.println("1. City Management");
             System.out.println("2. Distance Management");
+            System.out.println("3. Vehicle Management");
             System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
             choice = scanner.nextInt();
@@ -24,6 +26,9 @@ public class JavaAssigmnet01 {
                     break;
                 case 2:
                     manageDistances();
+                    break;
+                case 3:
+                    manageVehicles();
                     break;
                 case 0:
                     System.out.println("Exiting program...");
@@ -158,6 +163,61 @@ public class JavaAssigmnet01 {
 
                 case 2:
                     distanceManager.displayDistanceTable();
+                    break;
+
+                case 0:
+                    System.out.println("Returning to main menu...");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice! Please try again.");
+            }
+        } while (choice != 0);
+    }
+
+    private static void manageVehicles() {
+        int choice;
+        do {
+            System.out.println("\n--- Vehicle Management Menu ---");
+            System.out.println("1. View available vehicles");
+            System.out.println("2. Check vehicle capacity");
+            System.out.println("0. Back to main menu");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    vehicleManager.displayVehicles();
+                    break;
+
+                case 2:
+                    vehicleManager.displayVehicles();
+                    System.out.print("\nEnter vehicle number (1-" + vehicleManager.getVehicleCount() + "): ");
+                    int vehicleIndex = scanner.nextInt() - 1;
+                    scanner.nextLine(); // Consume newline
+
+                    if (vehicleIndex < 0 || vehicleIndex >= vehicleManager.getVehicleCount()) {
+                        System.out.println("Invalid vehicle number!");
+                        break;
+                    }
+
+                    System.out.print("Enter cargo weight (kg): ");
+                    int weight = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline
+
+                    if (weight <= 0) {
+                        System.out.println("Weight must be positive!");
+                        break;
+                    }
+
+                    String vehicleType = vehicleManager.getVehicleType(vehicleIndex);
+                    if (vehicleManager.canHandleWeight(vehicleIndex, weight)) {
+                        System.out.println(vehicleType + " can handle " + weight + " kg.");
+                    } else {
+                        System.out.println(vehicleType + " cannot handle " + weight + " kg.");
+                        System.out.println("Maximum capacity: " + vehicleManager.getCapacity(vehicleIndex) + " kg");
+                    }
                     break;
 
                 case 0:

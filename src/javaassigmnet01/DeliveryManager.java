@@ -66,11 +66,20 @@ public class DeliveryManager {
         int vehicleType;
         DeliveryCostEstimate costEstimate;
         
+        // Adding tracking information
+        private String status;  // "Pending", "In Progress", "Completed"
+        private String deliveryDate;  // When the delivery was completed
+        private int deliveryId;  // Unique ID for each delivery
+        private static int nextDeliveryId = 1;  // To generate unique IDs
+        
         public DeliveryRequest(String sourceCity, String destCity, int weight, int vehicleType) {
             this.sourceCity = sourceCity;
             this.destCity = destCity;
             this.weight = weight;
             this.vehicleType = vehicleType;
+            this.status = "Pending";
+            this.deliveryId = nextDeliveryId++;
+            this.deliveryDate = "-";
             
             // Calculate cost estimate
             int distance = distanceManager.getDistance(sourceCity, destCity);

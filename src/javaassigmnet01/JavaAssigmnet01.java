@@ -7,7 +7,7 @@ public class JavaAssigmnet01 {
     private static final CityManager cityManager = new CityManager();
     private static final DistanceManager distanceManager = new DistanceManager(cityManager);
     private static final VehicleManager vehicleManager = new VehicleManager();
-    private static final DeliveryManager deliveryManager = new DeliveryManager(cityManager, vehicleManager);
+    private static final DeliveryManager deliveryManager = new DeliveryManager(cityManager, vehicleManager, distanceManager);
 
     public static void main(String[] args) {
         int choice;

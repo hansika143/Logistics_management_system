@@ -7,11 +7,13 @@ public class DeliveryManager {
     private final int MAX_DELIVERIES = 50;  // Maximum deliveries as per requirement
     private final CityManager cityManager;
     private final VehicleManager vehicleManager;
+    private final DistanceManager distanceManager;
     
-    public DeliveryManager(CityManager cityManager, VehicleManager vehicleManager) {
+    public DeliveryManager(CityManager cityManager, VehicleManager vehicleManager, DistanceManager distanceManager) {
         this.requests = new ArrayList<>();
         this.cityManager = cityManager;
         this.vehicleManager = vehicleManager;
+        this.distanceManager = distanceManager;
     }
     
     public boolean validateDeliveryRequest(String sourceCity, String destCity, int weight, int vehicleType) {
@@ -22,6 +24,11 @@ public class DeliveryManager {
         
         // Check if source and destination are different
         if (sourceCity.equals(destCity)) {
+            return false;
+        }
+        
+        // Check if distance is set between cities
+        if (distanceManager.getDistance(sourceCity, destCity) <= 0) {
             return false;
         }
         

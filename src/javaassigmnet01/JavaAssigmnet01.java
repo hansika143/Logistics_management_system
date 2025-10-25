@@ -105,4 +105,68 @@ public class JavaAssigmnet01 {
             }
         } while (choice != 0);
     }
+
+    private static void manageDistances() {
+        int choice;
+        do {
+            System.out.println("\n--- Distance Management Menu ---");
+            System.out.println("1. Set distance between cities");
+            System.out.println("2. View distance table");
+            System.out.println("0. Back to main menu");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    System.out.println("\nAvailable cities:");
+                    var cities = cityManager.getAllCities();
+                    if (cities.isEmpty()) {
+                        System.out.println("No cities available. Please add cities first.");
+                        break;
+                    }
+                    
+                    for (int i = 0; i < cities.size(); i++) {
+                        System.out.println((i + 1) + ". " + cities.get(i));
+                    }
+
+                    System.out.print("\nEnter first city name: ");
+                    String city1 = scanner.nextLine().trim();
+                    System.out.print("Enter second city name: ");
+                    String city2 = scanner.nextLine().trim();
+                    
+                    if (city1.equalsIgnoreCase(city2)) {
+                        System.out.println("Cannot set distance from a city to itself!");
+                        break;
+                    }
+
+                    System.out.print("Enter distance (km): ");
+                    int distance = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline
+
+                    if (distance < 0) {
+                        System.out.println("Distance cannot be negative!");
+                        break;
+                    }
+
+                    if (distanceManager.setDistance(city1, city2, distance)) {
+                        System.out.println("Distance updated successfully!");
+                    } else {
+                        System.out.println("Invalid city names or distance!");
+                    }
+                    break;
+
+                case 2:
+                    distanceManager.displayDistanceTable();
+                    break;
+
+                case 0:
+                    System.out.println("Returning to main menu...");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice! Please try again.");
+            }
+        } while (choice != 0);
+    }
 }

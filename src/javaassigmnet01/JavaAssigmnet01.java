@@ -2,8 +2,19 @@ package javaassigmnet01;
 
 import java.util.Scanner;
 
+/**
+ * Main class for the Logistics Management System
+ * Created by: Hansika
+ * Date: October 25, 2025
+ * 
+ * This is my implementation of the logistics management system.
+ * The system helps manage deliveries between cities using different types of vehicles.
+ */
 public class JavaAssigmnet01 {
+    // Scanner for user input
     private static final Scanner scanner = new Scanner(System.in);
+    
+    // Create managers for different parts of the system
     private static final CityManager cityManager = new CityManager();
     private static final DistanceManager distanceManager = new DistanceManager(cityManager);
     private static final VehicleManager vehicleManager = new VehicleManager();
@@ -45,6 +56,8 @@ public class JavaAssigmnet01 {
                     generatePerformanceReport();
                     break;
                 case 0:
+                    System.out.println("Saving data...");
+                    saveAllData();
                     System.out.println("Exiting program...");
                     break;
                 default:
@@ -500,5 +513,13 @@ public class JavaAssigmnet01 {
             return;
         }
         performanceReports.generateReport();
+    }
+    
+    /**
+     * Save all data before exiting
+     */
+    private static void saveAllData() {
+        cityManager.saveCities();
+        distanceManager.saveDistances();
     }
 }

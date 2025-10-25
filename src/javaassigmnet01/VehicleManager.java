@@ -1,11 +1,30 @@
 package javaassigmnet01;
 
+/**
+ * VehicleManager class manages different types of vehicles and their properties.
+ * This class stores information about:
+ * - Vehicle types (Van, Truck, Lorry)
+ * - Vehicle capacities in kg
+ * - Cost rates per kilometer
+ * - Average speeds
+ * - Fuel efficiency (km/l)
+ * 
+ * @author Hansika
+ */
 public class VehicleManager {
-    // Define our vehicle types and their properties
+    // Array to store different types of vehicles
     private final String[] vehicleTypes = {"Van", "Truck", "Lorry"};
+    
+    // Array to store maximum weight capacity for each vehicle type (in kilograms)
     private final int[] capacities = {1000, 5000, 10000};  // in kg
+    
+    // Array to store cost per kilometer for each vehicle type (in Sri Lankan Rupees)
     private final int[] ratesPerKm = {30, 40, 80};        // in LKR
+    
+    // Array to store average speed for each vehicle type (in kilometers per hour)
     private final int[] avgSpeeds = {60, 50, 45};         // in km/h
+    
+    // Array to store fuel efficiency for each vehicle type (in kilometers per liter)
     private final int[] fuelEfficiencies = {12, 6, 4};    // in km/l
     
     public String getVehicleType(int index) {

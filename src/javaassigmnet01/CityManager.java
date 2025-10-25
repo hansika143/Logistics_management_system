@@ -3,13 +3,30 @@ package javaassigmnet01;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+/**
+ * CityManager class handles all operations related to cities in the system.
+ * This class is responsible for:
+ * - Storing city names
+ * - Adding new cities
+ * - Removing cities
+ * - Checking if cities exist
+ * 
+ * @author Hansika
+ */
 public class CityManager {
+    // ArrayList to store city names
     private ArrayList<String> cities;
+    // Maximum number of cities that can be stored
     private final int MAX_CITIES = 30;
     
+    /**
+     * Constructor for CityManager
+     * Initializes the cities list and adds some sample cities
+     */
     public CityManager() {
         cities = new ArrayList<>();
-        // Adding some initial cities for testing
+        loadCities();
+        // Adding initial cities for testing
         addCity("Colombo");
         addCity("Kandy");
         addCity("Galle");
@@ -72,5 +89,41 @@ public class CityManager {
             return cities.get(index);
         }
         return null;
+    }
+    
+    /**
+     * Load cities from file when starting
+     */
+    private void loadCities() {
+        // First try to load from file
+        ArrayList<String> loadedCities = new ArrayList<>();
+        int[][] dummyDistances = new int[MAX_CITIES][MAX_CITIES];
+        
+        if (!FileManager.loadRouteData(loadedCities, dummyDistances)) {
+            // If file doesn't exist, add default cities
+            addDefaultCities();
+        } else {
+            cities.addAll(loadedCities);
+        }
+    }
+    
+    /**
+     * Add some default cities if no file exists
+     */
+    private void addDefaultCities() {
+        addCity("Colombo");
+        addCity("Kandy");
+        addCity("Galle");
+        addCity("Jaffna");
+        addCity("Matara");
+    }
+    
+    /**
+     * Save current city list to file
+     */
+    public void saveCities() {
+        int[][] currentDistances = new int[MAX_CITIES][MAX_CITIES];
+        // Get current distances from DistanceManager if needed
+        FileManager.saveRouteData(cities, currentDistances);
     }
 }

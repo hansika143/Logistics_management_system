@@ -1,12 +1,81 @@
 package javaassigmnet01;
 
+import java.util.ArrayList;
+
+/**
+ * DistanceManager class handles the distances between cities.
+ * This class is responsible for:
+ * - Storing distances between cities
+ * - Calculating routes
+ * - Loading and saving distance data
+ * 
+ * @author Hansika
+ */
 public class DistanceManager {
+    // 2D array to store distances between cities
+    private final double[][] distances;
+    private final CityManager cityManager;
+    
+    /**
+     * Constructor for DistanceManager
+     * Initializes the distance matrix and loads existing data
+     * 
+     * @param cityManager Reference to CityManager for city operations
+     */
+    public DistanceManager(CityManager cityManager) {
+        this.cityManager = cityManager;
+        this.distances = new double[30][30];  // Maximum 30 cities as per requirement
+        loadDistances();
+    }
+    
+    /**
+     * Load distances from file
+     */
+    private void loadDistances() {
+        ArrayList<String> loadedCities = new ArrayList<>();
+        if (FileManager.loadRouteData(loadedCities, distances)) {
+            System.out.println("Distance data loaded from file.");
+        }
+    }
+    
+    /**
+     * Save current distances to file
+     */
+    public void saveDistances() {
+        FileManager.saveRouteData(cityManager.getAllCities(), distances);
+    }et01;
+
+public class DistanceMa    /**
+     * Load distances from file
+     */
+    private void loadDistances() {
+        ArrayList<String> loadedCities = new ArrayList<>();
+        if (FileManager.loadRouteData(loadedCities, distances)) {
+            // Distances loaded successfully
+            System.out.println("Distance data loaded from file.");
+        }
+    }
+    
+    /**
+     * Save current distances to file
+     */
+    public void saveDistances() {
+        FileManager.saveRouteData(cityManager.getAllCities(), distances);
+    }
+    
+    public void displayDistanceTable() {
+        var cities = cityManager.getAllCities();
+        if (cities.isEmpty()) {
+            System.out.println("No cities to display distances for.");
+            return;
+        }{
     private final int[][] distances;
     private final CityManager cityManager;
     
     public DistanceManager(CityManager cityManager) {
         this.cityManager = cityManager;
         this.distances = new int[cityManager.getMaxCities()][cityManager.getMaxCities()];
+        loadDistances();
         // Initialize all distances to -1 (indicating not set)
         for (int i = 0; i < distances.length; i++) {
             for (int j = 0; j < distances[i].length; j++) {

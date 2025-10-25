@@ -2,25 +2,93 @@ package javaassigmnet01;
 
 import java.util.ArrayList;
 
+/**
+ * DeliveryManager class handles all delivery-related operations.
+ * This class is responsible for:
+ * - Managing delivery requests
+ * - Calculating delivery costs
+ * - Tracking delivery status
+ * - Maintaining delivery history
+ * 
+ * The class works with CityManager, VehicleManager, and DistanceManager
+ * to handle all aspects of the delivery system.
+ * 
+ * @author Hansika
+ */
 public class DeliveryManager {
+    // List to store all delivery requests
     private ArrayList<DeliveryRequest> requests;
-    private final int MAX_DELIVERIES = 50;  // Maximum deliveries as per requirement
+    
+    // Maximum number of deliveries that can be handled (as per requirement)
+    private final int MAX_DELIVERIES = 50;
+    
+    // References to other managers needed for delivery operations
     private final CityManager cityManager;
     private final VehicleManager vehicleManager;
     private final DistanceManager distanceManager;
-    private static int nextDeliveryId = 1;  // To generate unique IDs
     
+    // Counter to generate unique delivery IDs
+    private static long nextDeliveryId = 1;
+    
+    /**
+     * Generates a new unique delivery ID.
+     * Handles potential overflow by resetting if necessary.
+     * @return A unique delivery ID
+     */
+    private synchronized static int generateDeliveryId() {
+        if (nextDeliveryId >= Integer.MAX_VALUE) {
+            // Reset ID counter if it's about to overflow
+            nextDeliveryId = 1;
+        }
+        return (int) nextDeliveryId++;
+    }
+    
+    /**
+     * Constructor for DeliveryManager
+     * Initializes the delivery system with required managers
+     * 
+     * @param cityManager Manages city operations
+     * @param vehicleManager Manages vehicle operations
+     * @param distanceManager Manages distance calculations
+     */
     public DeliveryManager(CityManager cityManager, VehicleManager vehicleManager, DistanceManager distanceManager) {
         this.requests = new ArrayList<>();
         this.cityManager = cityManager;
         this.vehicleManager = vehicleManager;
         this.distanceManager = distanceManager;
         
-        // Load delivery history from file
+        // Load existing delivery history from file
         loadDeliveryHistory();
     }
     
+    /**
+     * Validates a delivery request before it can be added to the system.
+     * Checks:
+     * - If both cities exist in the system
+     * - If source and destination cities are different
+     * - If there's a valid distance between cities
+     * - If the vehicle type is valid
+     * - If the vehicle can handle the given weight
+     *
+     * @param sourceCity The city where the delivery starts
+     * @param destCity The destination city
+     * @param weight The weight of the delivery in kg
+     * @param vehicleType The type of vehicle to use
+     * @return true if the request is valid, false otherwise
+     * @throws IllegalArgumentException if any parameter is null or invalid
+     */
     public boolean validateDeliveryRequest(String sourceCity, String destCity, int weight, int vehicleType) {
+        // Validate input parameters
+        if (sourceCity == null || destCity == null || sourceCity.trim().isEmpty() || destCity.trim().isEmpty()) {
+            throw new IllegalArgumentException("City names cannot be null or empty");
+        }
+        if (weight <= 0) {
+            throw new IllegalArgumentException("Weight must be greater than 0");
+        }
+        if (vehicleType < 0) {
+            throw new IllegalArgumentException("Vehicle type cannot be negative");
+        }
+        
         // Check if cities exist
         if (cityManager.getCityIndex(sourceCity) == -1 || cityManager.getCityIndex(destCity) == -1) {
             return false;
@@ -76,18 +144,21 @@ public class DeliveryManager {
         return true;
     }
     
-    // Basic delivery request class - we'll expand this later
-    class DeliveryRequest {
-        String sourceCity;
-        String destCity;
-        int weight;
-        int vehicleType;
-        DeliveryCostEstimate costEstimate;
+    /**
+     * Inner class to represent a delivery request.
+     * Encapsulates all information about a single delivery.
+     */
+    private static class DeliveryRequest {
+        private final String sourceCity;
+        private final String destCity;
+        private final int weight;
+        private final int vehicleType;
+        private final DeliveryCostEstimate costEstimate;
         
-        // Adding tracking information
+        // Tracking information
         private String status;  // "Pending", "In Progress", "Completed"
         private String deliveryDate;  // When the delivery was completed
-        private int deliveryId;  // Unique ID for each delivery
+        private final int deliveryId;  // Unique ID for each delivery
         
         public DeliveryRequest(String sourceCity, String destCity, int weight, int vehicleType) {
             this.sourceCity = sourceCity;
@@ -152,18 +223,26 @@ public class DeliveryManager {
         }
     }
     
+    /**
+     * Displays all delivery requests in the system.
+     * Shows a formatted table with delivery details.
+     */
     public void displayDeliveries() {
-        if (requests.isEmpty()) {
+        if (requests == null || requests.isEmpty()) {
             System.out.println("No deliveries in the system.");
             return;
         }
         
         System.out.println("\nDelivery Requests:");
-        System.out.println("----------------------------------------");
+        System.out.println("--------------------------------------------------------------------------------");
+        System.out.printf("%-5s %-12s %-12s %-8s %-10s %-12s %-10s%n", 
+            "No.", "From", "To", "Weight", "Vehicle", "Status", "Date");
+        System.out.println("--------------------------------------------------------------------------------");
+        
         for (int i = 0; i < requests.size(); i++) {
             System.out.printf("%d. %s%n", i + 1, requests.get(i));
         }
-        System.out.println("----------------------------------------");
+        System.out.println("--------------------------------------------------------------------------------");
     }
     
     public void displayDeliveryDetails(int index) {
@@ -242,18 +321,33 @@ public class DeliveryManager {
         return count;
     }
     
+    /**
+     * Loads delivery history from file.
+     * Handles file reading errors and data validation.
+     */
     private void loadDeliveryHistory() {
-        ArrayList<String> records = FileManager.readDeliveryRecords();
-        for (String record : records) {
-            String[] parts = record.split("\\|");
-            if (parts.length >= 7) {
-                String timestamp = parts[0];
-                String sourceCity = parts[1];
-                String destCity = parts[2];
-                int weight = Integer.parseInt(parts[3]);
-                String vehicleType = parts[4];
-                double cost = Double.parseDouble(parts[5]);
-                String status = parts[6];
+        try {
+            ArrayList<String> records = FileManager.readDeliveryRecords();
+            if (records == null) {
+                System.out.println("Warning: No delivery history found or file could not be read");
+                return;
+            }
+
+            for (String record : records) {
+                try {
+                    String[] parts = record.split("\\|");
+                    if (parts.length < 7) {
+                        System.out.println("Warning: Skipping invalid record format: " + record);
+                        continue;
+                    }
+
+                    String timestamp = parts[0].trim();
+                    String sourceCity = parts[1].trim();
+                    String destCity = parts[2].trim();
+                    int weight = Integer.parseInt(parts[3].trim());
+                    String vehicleType = parts[4].trim();
+                    double cost = Double.parseDouble(parts[5].trim());
+                    String status = parts[6].trim();
                 
                 // Find matching vehicle type index
                 int vehicleIndex = -1;

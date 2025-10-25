@@ -15,7 +15,7 @@ public class DeliveryCostEstimate {
     private final double estimatedTime;
     
     public DeliveryCostEstimate(String sourceCity, String destCity, int distance,
-            String vehicleType, int weight, int ratePerKm, int avgSpeed, int fuelEfficiency) {
+            String vehicleType, int weight, double ratePerKm, double avgSpeed, double fuelEfficiency) {
         
         this.sourceCity = sourceCity;
         this.destCity = destCity;
@@ -48,6 +48,10 @@ public class DeliveryCostEstimate {
         System.out.printf("Fuel Cost: %.2f LKR%n", fuelCost);
         System.out.printf("Operational Cost: %.2f LKR%n", operationalCost);
         System.out.printf("Profit: %.2f LKR%n", profit);
+    }
+    
+    public double getCustomerCharge() {
+        return customerCharge;
         System.out.printf("Customer Charge: %.2f LKR%n", customerCharge);
         System.out.printf("Estimated Time: %.2f hours%n", estimatedTime);
         System.out.println("======================================================");

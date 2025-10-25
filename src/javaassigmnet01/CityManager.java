@@ -47,6 +47,10 @@ public class CityManager {
         return cities.remove(cityName.trim());
     }
     
+    public boolean hasCity(String cityName) {
+        return cities.contains(cityName.trim());
+    }
+    
     public ArrayList<String> getAllCities() {
         return new ArrayList<>(cities);
     }

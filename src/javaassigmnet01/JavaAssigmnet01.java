@@ -8,6 +8,7 @@ public class JavaAssigmnet01 {
     private static final DistanceManager distanceManager = new DistanceManager(cityManager);
     private static final VehicleManager vehicleManager = new VehicleManager();
     private static final DeliveryManager deliveryManager = new DeliveryManager(cityManager, vehicleManager, distanceManager);
+    private static final PerformanceReports performanceReports = new PerformanceReports(deliveryManager, distanceManager);
 
     public static void main(String[] args) {
         int choice;
@@ -17,6 +18,8 @@ public class JavaAssigmnet01 {
             System.out.println("2. Distance Management");
             System.out.println("3. Vehicle Management");
             System.out.println("4. Delivery Management");
+            System.out.println("5. Route Optimization");
+            System.out.println("6. Performance Reports");
             System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
             choice = scanner.nextInt();
@@ -34,6 +37,12 @@ public class JavaAssigmnet01 {
                     break;
                 case 4:
                     manageDeliveries();
+                    break;
+                case 5:
+                    optimizeRoute();
+                    break;
+                case 6:
+                    generatePerformanceReport();
                     break;
                 case 0:
                     System.out.println("Exiting program...");
@@ -282,13 +291,32 @@ public class JavaAssigmnet01 {
                     vehicleManager.displayVehicles();
 
                     // Get vehicle and weight
-                    System.out.print("\nSelect vehicle (1-" + vehicleManager.getVehicleCount() + "): ");
-                    int vehicleType = scanner.nextInt() - 1;
-                    scanner.nextLine(); // Consume newline
+                    int vehicleType;
+                    int weight;
+                    
+                    try {
+                        System.out.print("\nSelect vehicle (1-" + vehicleManager.getVehicleCount() + "): ");
+                        vehicleType = scanner.nextInt() - 1;
+                        scanner.nextLine(); // Consume newline
+                        
+                        if (vehicleType < 0 || vehicleType >= vehicleManager.getVehicleCount()) {
+                            System.out.println("Invalid vehicle number!");
+                            continue;
+                        }
 
-                    System.out.print("Enter cargo weight (kg): ");
-                    int weight = scanner.nextInt();
-                    scanner.nextLine(); // Consume newline
+                        System.out.print("Enter cargo weight (kg): ");
+                        weight = scanner.nextInt();
+                        scanner.nextLine(); // Consume newline
+                        
+                        if (weight <= 0) {
+                            System.out.println("Weight must be positive!");
+                            continue;
+                        }
+                    } catch (Exception e) {
+                        System.out.println("Invalid input! Please enter valid numbers.");
+                        scanner.nextLine(); // Clear the invalid input
+                        continue;
+                    }
 
                     // Try to add the delivery request
                     if (deliveryManager.addDeliveryRequest(sourceCity, destCity, weight, vehicleType)) {
@@ -306,19 +334,45 @@ public class JavaAssigmnet01 {
                     deliveryManager.displayDeliveries();
                     if (deliveryManager.getDeliveryCount() > 0) {
                         System.out.print("\nEnter delivery ID to update: ");
-                        int id = scanner.nextInt();
-                        scanner.nextLine(); // Consume newline
+                        int id;
+                        try {
+                            id = scanner.nextInt();
+                            scanner.nextLine(); // Consume newline
+                        } catch (Exception e) {
+                            System.out.println("Invalid input! Please enter a valid number.");
+                            scanner.nextLine(); // Clear the invalid input
+                            continue;
+                        }
                         
                         System.out.println("\nChoose new status:");
-                        System.out.println("1. In Progress");
-                        System.out.println("2. Completed");
+                        System.out.println("1. Pending");
+                        System.out.println("2. In Progress");
+                        System.out.println("3. Completed");
                         System.out.print("Enter choice: ");
                         int statusChoice = scanner.nextInt();
                         scanner.nextLine(); // Consume newline
                         
-                        String newStatus = statusChoice == 1 ? "In Progress" : "Completed";
-                        deliveryManager.updateDeliveryStatus(id, newStatus);
-                        System.out.println("Delivery status updated!");
+                        String newStatus;
+                        switch(statusChoice) {
+                            case 1:
+                                newStatus = "Pending";
+                                break;
+                            case 2:
+                                newStatus = "In Progress";
+                                break;
+                            case 3:
+                                newStatus = "Completed";
+                                break;
+                            default:
+                                System.out.println("Invalid choice!");
+                                continue;
+                        }
+                        
+                        if (deliveryManager.updateDeliveryStatus(id, newStatus)) {
+                            System.out.println("Delivery status updated!");
+                        } else {
+                            System.out.println("Failed to update delivery status.");
+                        }
                     }
                     break;
 
@@ -334,5 +388,117 @@ public class JavaAssigmnet01 {
                     System.out.println("Invalid choice! Please try again.");
             }
         } while (choice != 0);
+    }
+    
+    private static void optimizeRoute() {
+        System.out.println("\n--- Route Optimization ---");
+        
+        // Show available cities
+        System.out.println("\nAvailable cities:");
+        var cities = cityManager.getAllCities();
+        if (cities.isEmpty()) {
+            System.out.println("No cities available. Please add cities first.");
+            return;
+        }
+        
+        for (int i = 0; i < cities.size(); i++) {
+            System.out.println((i + 1) + ". " + cities.get(i));
+        }
+        
+        // Get source and destination cities
+        System.out.print("\nEnter source city name: ");
+        String sourceCity = scanner.nextLine().trim();
+        System.out.print("Enter destination city name: ");
+        String destCity = scanner.nextLine().trim();
+        
+        if (sourceCity.equals(destCity)) {
+            System.out.println("Source and destination cannot be the same!");
+            return;
+        }
+        
+        // Validate source city
+        if (cityManager.getCityIndex(sourceCity) == -1) {
+            System.out.println("Source city '" + sourceCity + "' not found!");
+            return;
+        }
+        
+        // Validate destination city
+        if (cityManager.getCityIndex(destCity) == -1) {
+            System.out.println("Destination city '" + destCity + "' not found!");
+            return;
+        }
+        
+        // Find the best route
+        RouteOptimizer optimizer = new RouteOptimizer(cityManager, distanceManager);
+        Route bestRoute = optimizer.findBestRoute(sourceCity, destCity);
+        
+        if (bestRoute != null) {
+            System.out.println("\nBest route found:");
+            System.out.println(bestRoute);
+            System.out.println("Total distance: " + bestRoute.totalDistance + " km");
+            
+            // Show delivery cost estimates for this route
+            System.out.println("\nDelivery cost estimates for this route:");
+            System.out.println("----------------------------------------");
+            
+            // Get cargo weight for cost estimation
+            System.out.print("Enter cargo weight for cost estimation (kg): ");
+            int estimationWeight;
+            try {
+                estimationWeight = scanner.nextInt();
+                scanner.nextLine(); // Consume newline
+                
+                if (estimationWeight <= 0) {
+                    System.out.println("Weight must be positive! Using default weight of 1000kg.");
+                    estimationWeight = 1000;
+                }
+            } catch (Exception e) {
+                System.out.println("Invalid input! Using default weight of 1000kg.");
+                scanner.nextLine(); // Clear the invalid input
+                estimationWeight = 1000;
+            }
+            
+            // Show estimates for each vehicle type
+            for (int i = 0; i < vehicleManager.getVehicleCount(); i++) {
+                String vehicleType = vehicleManager.getVehicleType(i);
+                double ratePerKm = vehicleManager.getRatePerKm(i);
+                double avgSpeed = vehicleManager.getAvgSpeed(i);
+                double fuelEfficiency = vehicleManager.getFuelEfficiency(i);
+                
+                // Skip vehicles that can't handle the weight
+                if (!vehicleManager.canHandleWeight(i, estimationWeight)) {
+                    System.out.println("\n" + vehicleType + " cannot handle " + estimationWeight + "kg");
+                    continue;
+                }
+                
+                DeliveryCostEstimate estimate = new DeliveryCostEstimate(
+                    sourceCity,
+                    destCity,
+                    bestRoute.totalDistance,
+                    vehicleType,
+                    estimationWeight,
+                    ratePerKm,
+                    avgSpeed,
+                    fuelEfficiency
+                );
+                System.out.println("\nFor " + vehicleType + ":");
+                estimate.displayEstimate();
+            }
+            System.out.println("----------------------------------------");
+        } else {
+            System.out.println("No valid route found between " + sourceCity + 
+                    " and " + destCity);
+        }
+    }
+    
+    /**
+     * Generate and display performance reports
+     */
+    private static void generatePerformanceReport() {
+        if (deliveryManager.getDeliveryCount() == 0) {
+            System.out.println("\nNo deliveries to generate report from.");
+            return;
+        }
+        performanceReports.generateReport();
     }
 }

@@ -57,18 +57,42 @@ public class DeliveryManager {
         String destCity;
         int weight;
         int vehicleType;
+        DeliveryCostEstimate costEstimate;
         
         public DeliveryRequest(String sourceCity, String destCity, int weight, int vehicleType) {
             this.sourceCity = sourceCity;
             this.destCity = destCity;
             this.weight = weight;
             this.vehicleType = vehicleType;
+            
+            // Calculate cost estimate
+            int distance = distanceManager.getDistance(sourceCity, destCity);
+            if (distance > 0) {  // Only if we have a valid distance
+                this.costEstimate = new DeliveryCostEstimate(
+                    sourceCity, 
+                    destCity,
+                    distance,
+                    vehicleManager.getVehicleType(vehicleType),
+                    weight,
+                    vehicleManager.getRatePerKm(vehicleType),
+                    vehicleManager.getAvgSpeed(vehicleType),
+                    vehicleManager.getFuelEfficiency(vehicleType)
+                );
+            }
         }
         
         @Override
         public String toString() {
             return String.format("From: %-10s To: %-10s Weight: %-5dkg Vehicle: %s", 
                 sourceCity, destCity, weight, vehicleManager.getVehicleType(vehicleType));
+        }
+        
+        public void displayCostEstimate() {
+            if (costEstimate != null) {
+                costEstimate.displayEstimate();
+            } else {
+                System.out.println("Cannot calculate cost - distance not set between cities.");
+            }
         }
     }
     
@@ -84,6 +108,14 @@ public class DeliveryManager {
             System.out.printf("%d. %s%n", i + 1, requests.get(i));
         }
         System.out.println("----------------------------------------");
+    }
+    
+    public void displayDeliveryDetails(int index) {
+        if (index >= 0 && index < requests.size()) {
+            requests.get(index).displayCostEstimate();
+        } else {
+            System.out.println("Invalid delivery number!");
+        }
     }
     
     public int getDeliveryCount() {

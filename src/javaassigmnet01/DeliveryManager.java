@@ -64,5 +64,33 @@ public class DeliveryManager {
             this.weight = weight;
             this.vehicleType = vehicleType;
         }
+        
+        @Override
+        public String toString() {
+            return String.format("From: %-10s To: %-10s Weight: %-5dkg Vehicle: %s", 
+                sourceCity, destCity, weight, vehicleManager.getVehicleType(vehicleType));
+        }
+    }
+    
+    public void displayDeliveries() {
+        if (requests.isEmpty()) {
+            System.out.println("No deliveries in the system.");
+            return;
+        }
+        
+        System.out.println("\nDelivery Requests:");
+        System.out.println("----------------------------------------");
+        for (int i = 0; i < requests.size(); i++) {
+            System.out.printf("%d. %s%n", i + 1, requests.get(i));
+        }
+        System.out.println("----------------------------------------");
+    }
+    
+    public int getDeliveryCount() {
+        return requests.size();
+    }
+    
+    public int getRemainingCapacity() {
+        return MAX_DELIVERIES - requests.size();
     }
 }

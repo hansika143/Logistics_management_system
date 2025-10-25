@@ -110,6 +110,26 @@ public class DeliveryManager {
                 System.out.println("Cannot calculate cost - distance not set between cities.");
             }
         }
+        
+        public void updateStatus(String newStatus) {
+            this.status = newStatus;
+            if (newStatus.equals("Completed")) {
+                // Get current date in simple format using just string for now
+                this.deliveryDate = java.time.LocalDate.now().toString();
+            }
+        }
+        
+        public String getStatus() {
+            return status;
+        }
+        
+        public int getDeliveryId() {
+            return deliveryId;
+        }
+        
+        public String getDeliveryDate() {
+            return deliveryDate;
+        }
     }
     
     public void displayDeliveries() {

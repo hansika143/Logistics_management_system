@@ -7,6 +7,7 @@ public class JavaAssigmnet01 {
     private static final CityManager cityManager = new CityManager();
     private static final DistanceManager distanceManager = new DistanceManager(cityManager);
     private static final VehicleManager vehicleManager = new VehicleManager();
+    private static final DeliveryManager deliveryManager = new DeliveryManager(cityManager, vehicleManager);
 
     public static void main(String[] args) {
         int choice;
@@ -15,6 +16,7 @@ public class JavaAssigmnet01 {
             System.out.println("1. City Management");
             System.out.println("2. Distance Management");
             System.out.println("3. Vehicle Management");
+            System.out.println("4. Delivery Management");
             System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
             choice = scanner.nextInt();
@@ -29,6 +31,9 @@ public class JavaAssigmnet01 {
                     break;
                 case 3:
                     manageVehicles();
+                    break;
+                case 4:
+                    manageDeliveries();
                     break;
                 case 0:
                     System.out.println("Exiting program...");
@@ -218,6 +223,81 @@ public class JavaAssigmnet01 {
                         System.out.println(vehicleType + " cannot handle " + weight + " kg.");
                         System.out.println("Maximum capacity: " + vehicleManager.getCapacity(vehicleIndex) + " kg");
                     }
+                    break;
+
+                case 0:
+                    System.out.println("Returning to main menu...");
+                    break;
+
+                default:
+                    System.out.println("Invalid choice! Please try again.");
+            }
+        } while (choice != 0);
+    }
+
+    private static void manageDeliveries() {
+        int choice;
+        do {
+            System.out.println("\n--- Delivery Management Menu ---");
+            System.out.println("1. Create new delivery request");
+            System.out.println("2. View all deliveries");
+            System.out.println("0. Back to main menu");
+            System.out.print("Enter your choice: ");
+            choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
+
+            switch (choice) {
+                case 1:
+                    // Check delivery capacity
+                    if (deliveryManager.getRemainingCapacity() <= 0) {
+                        System.out.println("Cannot add more deliveries. Maximum limit reached!");
+                        break;
+                    }
+
+                    // Show available cities
+                    System.out.println("\nAvailable cities:");
+                    var cities = cityManager.getAllCities();
+                    if (cities.isEmpty()) {
+                        System.out.println("No cities available. Please add cities first.");
+                        break;
+                    }
+                    for (int i = 0; i < cities.size(); i++) {
+                        System.out.println((i + 1) + ". " + cities.get(i));
+                    }
+
+                    // Get source and destination
+                    System.out.print("\nEnter source city name: ");
+                    String sourceCity = scanner.nextLine().trim();
+                    System.out.print("Enter destination city name: ");
+                    String destCity = scanner.nextLine().trim();
+
+                    if (sourceCity.equals(destCity)) {
+                        System.out.println("Source and destination cannot be the same!");
+                        break;
+                    }
+
+                    // Show available vehicles
+                    vehicleManager.displayVehicles();
+
+                    // Get vehicle and weight
+                    System.out.print("\nSelect vehicle (1-" + vehicleManager.getVehicleCount() + "): ");
+                    int vehicleType = scanner.nextInt() - 1;
+                    scanner.nextLine(); // Consume newline
+
+                    System.out.print("Enter cargo weight (kg): ");
+                    int weight = scanner.nextInt();
+                    scanner.nextLine(); // Consume newline
+
+                    // Try to add the delivery request
+                    if (deliveryManager.addDeliveryRequest(sourceCity, destCity, weight, vehicleType)) {
+                        System.out.println("Delivery request added successfully!");
+                    } else {
+                        System.out.println("Failed to add delivery request. Please check your inputs.");
+                    }
+                    break;
+
+                case 2:
+                    deliveryManager.displayDeliveries();
                     break;
 
                 case 0:

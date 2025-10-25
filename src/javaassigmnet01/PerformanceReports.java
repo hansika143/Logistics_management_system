@@ -56,7 +56,7 @@ public class PerformanceReports {
         
         for (DeliveryManager.DeliveryRequest delivery : deliveries) {
             if (delivery.getStatus().equals("Completed")) {
-                totalDistance += distanceManager.getDistance(delivery.sourceCity, delivery.destCity);
+                totalDistance += distanceManager.getDistance(delivery.getSourceCity(), delivery.getDestCity());
             }
         }
         
@@ -69,9 +69,9 @@ public class PerformanceReports {
         var deliveries = deliveryManager.getAllDeliveries();
         
         for (DeliveryManager.DeliveryRequest delivery : deliveries) {
-            if (delivery.getStatus().equals("Completed") && delivery.costEstimate != null) {
+            if (delivery.getStatus().equals("Completed") && delivery.getCostEstimate() != null) {
                 // Get delivery time from cost estimate
-                totalTime += delivery.costEstimate.getEstimatedTime();
+                totalTime += delivery.getCostEstimate().getEstimatedTime();
                 completedCount++;
             }
         }
@@ -85,9 +85,9 @@ public class PerformanceReports {
         var deliveries = deliveryManager.getAllDeliveries();
         
         for (DeliveryManager.DeliveryRequest delivery : deliveries) {
-            if (delivery.getStatus().equals("Completed") && delivery.costEstimate != null) {
-                totalRevenue += delivery.costEstimate.getCustomerCharge();
-                totalProfit += delivery.costEstimate.getProfit();
+            if (delivery.getStatus().equals("Completed") && delivery.getCostEstimate() != null) {
+                totalRevenue += delivery.getCostEstimate().getCustomerCharge();
+                totalProfit += delivery.getCostEstimate().getProfit();
             }
         }
         
@@ -108,16 +108,16 @@ public class PerformanceReports {
         
         for (DeliveryManager.DeliveryRequest delivery : deliveries) {
             if (delivery.getStatus().equals("Completed")) {
-                int distance = distanceManager.getDistance(delivery.sourceCity, delivery.destCity);
+                int distance = distanceManager.getDistance(delivery.getSourceCity(), delivery.getDestCity());
                 
                 if (distance < shortestDistance) {
                     shortestDistance = distance;
-                    shortestRoute = delivery.sourceCity + " → " + delivery.destCity;
+                    shortestRoute = delivery.getSourceCity() + " → " + delivery.getDestCity();
                 }
                 
                 if (distance > longestDistance) {
                     longestDistance = distance;
-                    longestRoute = delivery.sourceCity + " → " + delivery.destCity;
+                    longestRoute = delivery.getSourceCity() + " → " + delivery.getDestCity();
                 }
             }
         }

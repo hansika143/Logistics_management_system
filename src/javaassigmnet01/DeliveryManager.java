@@ -148,17 +148,23 @@ public class DeliveryManager {
      * Inner class to represent a delivery request.
      * Encapsulates all information about a single delivery.
      */
-    private static class DeliveryRequest {
-        private final String sourceCity;
-        private final String destCity;
-        private final int weight;
-        private final int vehicleType;
-        private final DeliveryCostEstimate costEstimate;
+    public class DeliveryRequest {
+    private final String sourceCity;
+    private final String destCity;
+    private final int weight;
+    private final int vehicleType;
+    private final DeliveryCostEstimate costEstimate;
         
-        // Tracking information
-        private String status;  // "Pending", "In Progress", "Completed"
-        private String deliveryDate;  // When the delivery was completed
-        private final int deliveryId;  // Unique ID for each delivery
+    // Tracking information
+    private String status;  // "Pending", "In Progress", "Completed"
+    private String deliveryDate;  // When the delivery was completed
+    private final int deliveryId;  // Unique ID for each delivery
+
+    public String getSourceCity() { return sourceCity; }
+    public String getDestCity() { return destCity; }
+    public int getWeight() { return weight; }
+    public int getVehicleType() { return vehicleType; }
+    public DeliveryCostEstimate getCostEstimate() { return costEstimate; }
         
         public DeliveryRequest(String sourceCity, String destCity, int weight, int vehicleType) {
             this.sourceCity = sourceCity;
@@ -166,7 +172,7 @@ public class DeliveryManager {
             this.weight = weight;
             this.vehicleType = vehicleType;
             this.status = "Pending";
-            this.deliveryId = DeliveryManager.nextDeliveryId++;
+            this.deliveryId = generateDeliveryId();
             this.deliveryDate = "-";
             
             // Calculate cost estimate
@@ -182,6 +188,8 @@ public class DeliveryManager {
                     vehicleManager.getAvgSpeed(vehicleType),
                     vehicleManager.getFuelEfficiency(vehicleType)
                 );
+            } else {
+                this.costEstimate = null;
             }
         }
         
@@ -349,21 +357,25 @@ public class DeliveryManager {
                     double cost = Double.parseDouble(parts[5].trim());
                     String status = parts[6].trim();
                 
-                // Find matching vehicle type index
-                int vehicleIndex = -1;
-                for (int i = 0; i < vehicleManager.getVehicleCount(); i++) {
-                    if (vehicleManager.getVehicleType(i).equals(vehicleType)) {
-                        vehicleIndex = i;
-                        break;
+                    // Find matching vehicle type index
+                    int vehicleIndex = -1;
+                    for (int i = 0; i < vehicleManager.getVehicleCount(); i++) {
+                        if (vehicleManager.getVehicleType(i).equals(vehicleType)) {
+                            vehicleIndex = i;
+                            break;
+                        }
                     }
-                }
-                
-                if (vehicleIndex != -1) {
-                    DeliveryRequest request = new DeliveryRequest(sourceCity, destCity, weight, vehicleIndex);
-                    request.updateStatus(status);
-                    requests.add(request);
+                    if (vehicleIndex != -1) {
+                        DeliveryRequest request = new DeliveryRequest(sourceCity, destCity, weight, vehicleIndex);
+                        request.updateStatus(status);
+                        requests.add(request);
+                    }
+                } catch (Exception e) {
+                    System.out.println("Warning: Error parsing record: " + record);
                 }
             }
+        } catch (Exception e) {
+            System.out.println("Error loading delivery history: " + e.getMessage());
         }
     }
     

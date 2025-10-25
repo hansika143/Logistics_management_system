@@ -52,8 +52,13 @@ public class DeliveryCostEstimate {
     
     public double getCustomerCharge() {
         return customerCharge;
-        System.out.printf("Customer Charge: %.2f LKR%n", customerCharge);
-        System.out.printf("Estimated Time: %.2f hours%n", estimatedTime);
-        System.out.println("======================================================");
+    }
+
+    public double getEstimatedTime() {
+        return estimatedTime;
+    }
+
+    public double getProfit() {
+        return profit;
     }
 }

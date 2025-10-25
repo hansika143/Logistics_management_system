@@ -5,12 +5,14 @@ import java.util.Scanner;
 public class JavaAssigmnet01 {
     private static final Scanner scanner = new Scanner(System.in);
     private static final CityManager cityManager = new CityManager();
+    private static final DistanceManager distanceManager = new DistanceManager(cityManager);
 
     public static void main(String[] args) {
         int choice;
         do {
             System.out.println("\n=== Logistics Management System ===");
             System.out.println("1. City Management");
+            System.out.println("2. Distance Management");
             System.out.println("0. Exit");
             System.out.print("Enter your choice: ");
             choice = scanner.nextInt();
@@ -19,6 +21,9 @@ public class JavaAssigmnet01 {
             switch (choice) {
                 case 1:
                     manageCities();
+                    break;
+                case 2:
+                    manageDistances();
                     break;
                 case 0:
                     System.out.println("Exiting program...");

@@ -241,6 +241,8 @@ public class JavaAssigmnet01 {
             System.out.println("\n--- Delivery Management Menu ---");
             System.out.println("1. Create new delivery request");
             System.out.println("2. View all deliveries");
+            System.out.println("3. Update delivery status");
+            System.out.println("4. View delivery statistics");
             System.out.println("0. Back to main menu");
             System.out.print("Enter your choice: ");
             choice = scanner.nextInt();
@@ -298,6 +300,30 @@ public class JavaAssigmnet01 {
 
                 case 2:
                     deliveryManager.displayDeliveries();
+                    break;
+
+                case 3:
+                    deliveryManager.displayDeliveries();
+                    if (deliveryManager.getDeliveryCount() > 0) {
+                        System.out.print("\nEnter delivery ID to update: ");
+                        int id = scanner.nextInt();
+                        scanner.nextLine(); // Consume newline
+                        
+                        System.out.println("\nChoose new status:");
+                        System.out.println("1. In Progress");
+                        System.out.println("2. Completed");
+                        System.out.print("Enter choice: ");
+                        int statusChoice = scanner.nextInt();
+                        scanner.nextLine(); // Consume newline
+                        
+                        String newStatus = statusChoice == 1 ? "In Progress" : "Completed";
+                        deliveryManager.updateDeliveryStatus(id, newStatus);
+                        System.out.println("Delivery status updated!");
+                    }
+                    break;
+
+                case 4:
+                    deliveryManager.displayDeliveryStats();
                     break;
 
                 case 0:

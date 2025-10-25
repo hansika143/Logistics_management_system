@@ -99,8 +99,9 @@ public class DeliveryManager {
         
         @Override
         public String toString() {
-            return String.format("From: %-10s To: %-10s Weight: %-5dkg Vehicle: %s", 
-                sourceCity, destCity, weight, vehicleManager.getVehicleType(vehicleType));
+            return String.format("ID: %-3d | From: %-10s To: %-10s | Weight: %-5dkg | Vehicle: %-8s | Status: %-10s | Date: %s", 
+                deliveryId, sourceCity, destCity, weight, vehicleManager.getVehicleType(vehicleType),
+                status, deliveryDate);
         }
         
         public void displayCostEstimate() {
@@ -160,5 +161,44 @@ public class DeliveryManager {
     
     public int getRemainingCapacity() {
         return MAX_DELIVERIES - requests.size();
+    }
+    
+    public void updateDeliveryStatus(int deliveryId, String newStatus) {
+        for (DeliveryRequest request : requests) {
+            if (request.getDeliveryId() == deliveryId) {
+                request.updateStatus(newStatus);
+                return;
+            }
+        }
+        System.out.println("Delivery ID not found!");
+    }
+    
+    public int getCompletedDeliveries() {
+        int count = 0;
+        for (DeliveryRequest request : requests) {
+            if (request.getStatus().equals("Completed")) {
+                count++;
+            }
+        }
+        return count;
+    }
+    
+    public int getPendingDeliveries() {
+        int count = 0;
+        for (DeliveryRequest request : requests) {
+            if (request.getStatus().equals("Pending")) {
+                count++;
+            }
+        }
+        return count;
+    }
+    
+    public void displayDeliveryStats() {
+        System.out.println("\n=== Delivery Statistics ===");
+        System.out.println("Total Deliveries: " + requests.size());
+        System.out.println("Completed Deliveries: " + getCompletedDeliveries());
+        System.out.println("Pending Deliveries: " + getPendingDeliveries());
+        System.out.println("Remaining Capacity: " + getRemainingCapacity());
+        System.out.println("=========================");
     }
 }
